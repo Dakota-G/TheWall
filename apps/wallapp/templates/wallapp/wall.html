@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>The Wall</title>
+	{% load static %}
+	<link rel="stylesheet" href="{% static 'wallapp/css/style.css' %}">
+</head>
+<body>
+<div id = "header">
+	<h1> Success! Welcome, {{ request.session.validuser_firstname }}! </h1>
+	<h2> Good job logging in successfully! </h2>
+	<a href ="/logout"> Log Out</a>
+</div>
+
+<div id="post">
+	<form action ="/submit_post" method = "POST">
+	{% csrf_token %}
+		<input type ="text" name="posttitle">
+		<input type ="text"	name="postcontent">
+		<button>Post!</button>
+	</form>
+</div>
+<div id = "messager2">
+	{% if messages %}
+<ul class="messages">    
+    {% for message in messages %}    
+        <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>    
+    {% endfor %}
+</ul>
+{% endif %}
+</div>
+<div id="posts">
+	{% for post in all_posts %}
+	<h2>{{ post.poster.firstname }}: {{ post.created_at }}</h2>
+	<a href = '/delete_post/{{ post.id }}'>Delete Post</a>
+	<h3>{{ post.title}}:</h3> 
+	<p>{{ post.content }}</p>
+
+		{% for comment in comments %}
+			{% if comment.parent.id == post.id %}
+				<h4>{{ comment.commenter.firstname }}: {{ comment.created_at}}</h4>
+				<p>{{ comment.content }}</p>
+			{% endif %}
+		{% endfor %}
+		<form action ="/submit_comment/{{post.id}}" method = "POST">
+		{% csrf_token %}
+			<input type ="text"	name="commentcontent">
+			<button>Comment!</button>
+		</form>
+		
+	{% endfor %}
+</div>
+
+</body>
+</html>
